@@ -1,0 +1,7 @@
+---
+dotnet_dir: "/opt/dotnet"
+dotnet_version: 9.0
+dotnet_url: "https://dot.net/v1/dotnet-install.sh"
+
+technitium_dir: "/opt/technitium/dns"
+technitium_download_url: "https://download.technitium.com/dns/DnsServerPortable.tar.gz"

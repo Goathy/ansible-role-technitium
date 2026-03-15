@@ -1,0 +1,97 @@
+---
+- name: Install required packages
+  ansible.builtin.dnf:
+    name:
+      - "tar"
+      - "libicu"
+    state: "present"
+
+- name: Check if dotnet runtime is present
+  ansible.builtin.stat:
+    path: "{{ dotnet_dir }}"
+  register: dotnet
+
+- name: Install dotnet runtime
+  when: not dotnet.stat.exists
+  block:
+    - name: Create tmp directory
+      ansible.builtin.tempfile:
+        path: "/tmp"
+        state: "directory"
+      register: tmp_dir
+
+    - name: Download installation script
+      ansible.builtin.get_url:
+        url: "{{ dotnet_url }}"
+        dest: "{{ tmp_dir.path }}/install.sh"
+        owner: "root"
+        group: "root"
+        mode: "0100"
+
+    - name: Install dotnet environment
+      ansible.builtin.shell:
+        executable: "bash"
+        chdir: "{{ tmp_dir.path }}"
+        cmd: >
+          ./install.sh
+          -c "{{ dotnet_version }}"
+          --runtime aspnetcore
+          --no-path
+          --install-dir "{{ dotnet_dir }}"
+      changed_when: true
+
+    - name: Cleanup
+      ansible.builtin.file:
+        path: "{{ tmp_dir.path }}"
+        state: "absent"
+
+- name: Check if Technitium DNS is present
+  ansible.builtin.stat:
+    path: "{{ technitium_dir }}"
+  register: dns
+
+- name: Install Technitium DNS
+  when: not dns.stat.exists
+  block:
+    - name: Create Technitium directory
+      ansible.builtin.file:
+        path: "{{ technitium_dir }}"
+        mode: "0644"
+        state: directory
+
+    - name: Create tmp directory
+      ansible.builtin.tempfile:
+        path: "/tmp"
+        state: "directory"
+      register: tmp
+
+    - name: Download Technitium DNS archive
+      ansible.builtin.get_url:
+        url: "{{ technitium_download_url }}"
+        dest: "{{ tmp.path }}/dns.tar.gz"
+        mode: "0600"
+
+    - name: Extract Technitium DNS archive
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "{{ tmp.path }}/dns.tar.gz"
+        dest: "{{ technitium_dir }}"
+
+    - name: Cleanup
+      ansible.builtin.file:
+        path: "{{ tmp.path }}"
+        state: "absent"
+
+    - name: Copy systemd service file
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ technitium_dir }}/systemd.service"
+        dest: "/etc/systemd/system/dns.service"
+        mode: "0400"
+
+- name: Start DNS service
+  ansible.builtin.systemd_service:
+    name: "dns.service"
+    daemon_reload: true
+    enabled: true
+    state: "started"

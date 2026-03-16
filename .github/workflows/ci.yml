@@ -4,13 +4,13 @@ name: CI
   pull_request:
   push:
     branches:
-      - master
+      - main
   schedule:
     - cron: "30 1 * * 3"
 
 defaults:
   run:
-    working-directory: 'geerlingguy.nfs'
+    working-directory: 'goathy.technitium_dns'
 
 jobs:
 
@@ -19,21 +19,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the codebase.
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: 'geerlingguy.nfs'
+          path: 'goathy.technitium_dns'
 
-      - name: Set up Python 3.
-        uses: actions/setup-python@v5
+      - name: Run ansible-lint
+        uses: ansible/ansible-lint@8ba9595a4acd1b906eb75568b34f6ef592cd1528
         with:
-          python-version: '3.13'  # Can't go to 3.14+ until Ansible 13.x
-
-      - name: Install test dependencies.
-        run: pip3 install yamllint
-
-      - name: Lint code.
-        run: |
-          yamllint .
+          setup_python: "true"
+          python_version: "3.13"
+          working_directory: 'goathy.technitium_dns'
 
   molecule:
     name: Molecule
@@ -41,17 +36,17 @@ jobs:
     strategy:
       matrix:
         distro:
-          - rockylinux10
-          - ubuntu2404
+          - almalinux9
+          - almalinux10
 
     steps:
       - name: Check out the codebase.
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
-          path: 'geerlingguy.nfs'
+          path: 'goathy.technitium_dns'
 
       - name: Set up Python 3.
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: '3.13'  # Can't go to 3.14+ until Ansible 13.x
 

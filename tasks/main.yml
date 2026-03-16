@@ -43,7 +43,7 @@
     - name: Create symbolic link
       ansible.builtin.file:
         src: "{{ dotnet_dir }}/dotnet"
-        dest: "/usr/bin"
+        dest: "/usr/bin/dotnet"
         owner: "root"
         group: "root"
         state: "link"

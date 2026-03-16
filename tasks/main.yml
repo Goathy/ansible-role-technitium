@@ -40,6 +40,14 @@
           --install-dir "{{ dotnet_dir }}"
       changed_when: true
 
+    - name: Create symbolic link
+      ansible.builtin.file:
+        src: "{{ dotnet_dir }}/dotnet"
+        dest: "/usr/bin"
+        owner: "root"
+        group: "root"
+        state: "link"
+
     - name: Cleanup
       ansible.builtin.file:
         path: "{{ tmp_dir.path }}"

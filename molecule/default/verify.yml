@@ -1,0 +1,49 @@
+---
+- name: "Verify"
+  hosts: "all"
+  gather_facts: true
+
+  tasks:
+    - name: "Check if dotnet runtime is present"
+      ansible.builtin.stat:
+        path: "/opt/dotnet"
+      register: "dotnet"
+
+    - name: "Verify if dotnet runtime is present"
+      ansible.builtin.assert:
+        that:
+          - "dotnet.stat.exists"
+        fail_msg: "dotnet runtime is not available"
+
+    - name: "Check if dotnet binary is available under /usr/bin directory"
+      ansible.builtin.stat:
+        path: "/usr/bin/dotnet"
+      register: "dotnet_binary"
+
+    - name: "Verify if dotnet binary is available under /usr/bin directory"
+      ansible.builtin.assert:
+        that:
+          - "dotnet_binary.stat.exists"
+          - "dotnet_binary.stat.islnk"
+        fail_msg: "dotnet runtime is not available"
+
+    - name: "Check if Technitium DSN is present"
+      ansible.builtin.stat:
+        path: "/opt/technitium/dns"
+      register: "technitium"
+
+    - name: "Verify if Technitium DNS is present"
+      ansible.builtin.assert:
+        that:
+          - "technitium.stat.exists"
+        fail_msg: "technitium is not present"
+
+    - name: "Check if Technitium DNS is running"
+      ansible.builtin.service_facts:
+
+    - name: "Verify if Technitium DNS is running"
+      ansible.builtin.assert:
+        that:
+          - "ansible_facts.services['dns.service'].state == 'running'"
+          - "ansible_facts.services['dns.service'].status == 'enabled'"
+        fail_msg: "Technitium DNS is not running"

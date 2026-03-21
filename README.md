@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Goathy/ansible-role-technitium/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Goathy/ansible-role-technitium/actions/workflows/ci.yml)
 
-An Ansible Role that installs Technitium DNS server on Almalinu.
+An Ansible Role that installs Technitium DNS server on Almalinux.
 
 ## Requirements
 
